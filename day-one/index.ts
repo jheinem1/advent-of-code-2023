@@ -5,7 +5,7 @@ const dayOne = async () => {
     const numbers = input.map((line) => {
         let firstDigit: undefined | string;
         let lastDigit: undefined | string;
-        for (var match of line.matchAll(/\d/g)) {
+        for (const match of line.matchAll(/\d/g)) {
             firstDigit = firstDigit ?? match[0];
             lastDigit = match[0];
         }
