@@ -58,17 +58,31 @@ const isPossible = (possibility: Round, game: Game): boolean => {
   return false;
 };
 
-const dayOne = async (possibleCubes: Round) => {
+const partOne = async (possibleCubes: Round) => {
   const input = (await readFile("./day-two/input.txt", "utf-8")).split("\n");
   const games = input.map(parseGame);
   const possibleGames = games.filter((game) => isPossible(possibleCubes, game));
   return possibleGames.map((game) => game.id).reduce((a, b) => a + b, 0);
 };
 
-dayOne({
+partOne({
   red: 12,
   green: 13,
   blue: 14,
 })
+  .then((solution) => console.log(solution))
+  .catch((err) => console.error(err));
+
+const partTwo = async () => {
+  const input = (await readFile("./day-two/input.txt", "utf-8")).split("\n");
+  const games = input.map(parseGame);
+  const maxCubesFromGames = games.map(maximumCubesFromGame);
+  const powerMaxCubesFromGames = maxCubesFromGames.map(
+    (maxCubes) => maxCubes.red * maxCubes.green * maxCubes.blue
+  );
+  return powerMaxCubesFromGames.reduce((a, b) => a + b);
+};
+
+partTwo()
   .then((solution) => console.log(solution))
   .catch((err) => console.error(err));
