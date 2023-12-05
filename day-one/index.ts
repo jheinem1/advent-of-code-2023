@@ -1,5 +1,9 @@
 import { readFile } from "fs/promises";
 
+const input = (await readFile("./day-one-part-one/input.txt", "utf-8")).split(
+  "\n"
+);
+
 const digitMap = new Map([
   ["one", "1"],
   ["two", "2"],
@@ -38,16 +42,33 @@ const extractFirstAndLastDigits = (line: string) => {
   throw "No numbers found";
 };
 
-const dayOne = async () => {
-  const input = (await readFile("./day-one-part-two/input.txt", "utf-8")).split(
-    "\n"
-  );
+const partOne = async () => {
+  const numbers = input.map((line) => {
+    let firstDigit: undefined | string;
+    let lastDigit: undefined | string;
+    for (const match of line.matchAll(/\d/g)) {
+      firstDigit = firstDigit ?? match[0];
+      lastDigit = match[0];
+    }
+    if (firstDigit && lastDigit) {
+      return parseInt(firstDigit.concat(lastDigit));
+    }
+    throw "No numbers found";
+  });
+  return numbers.reduce((a, b) => a + b);
+};
+
+partOne()
+  .then((solution) => console.log(solution))
+  .catch((err) => console.error(err));
+
+const partTwo = async () => {
   const numbers = input
     .map(replaceSingleDigitWordsWithNumbers)
     .map(extractFirstAndLastDigits);
   return numbers.reduce((a, b) => a + b);
 };
 
-dayOne()
+partTwo()
   .then((solution) => console.log(solution))
   .catch((err) => console.error(err));
