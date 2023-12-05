@@ -39,9 +39,7 @@ const extractFirstAndLastDigits = (line: string) => {
 };
 
 const dayOne = async () => {
-  const input = (await readFile("./day-one-part-two/input.txt", "utf-8")).split(
-    "\n"
-  );
+  const input = (await readFile("./day-one/input.txt", "utf-8")).split("\n");
   const numbers = input
     .map(replaceSingleDigitWordsWithNumbers)
     .map(extractFirstAndLastDigits);
