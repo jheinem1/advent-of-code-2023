@@ -1,7 +1,9 @@
 import { readFile } from "fs/promises";
 
 const dayOne = async () => {
-  const input = (await readFile("./day-one/input.txt", "utf-8")).split("\n");
+  const input = (await readFile("./day-one-part-one/input.txt", "utf-8")).split(
+    "\n"
+  );
   const numbers = input.map((line) => {
     let firstDigit: undefined | string;
     let lastDigit: undefined | string;
