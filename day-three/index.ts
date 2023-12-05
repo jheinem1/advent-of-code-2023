@@ -52,28 +52,60 @@ const parseEngineSchematic = (unparsedSchematic: string[]): EngineSchematic => {
   return schematic;
 };
 
-const isValidPartNumber = (partNumber: PartNumber, symbols: Symbol[]) => {
-  for (const symbol of symbols) {
-    if (symbol.position.y === partNumber.position.y) {
-      if (
-        symbol.position.x === partNumber.position.x - 1 ||
-        symbol.position.x === partNumber.position.x + partNumber.xSize
-      ) {
-        return true;
-      }
-    } else if (
-      symbol.position.y === partNumber.position.y - 1 ||
-      symbol.position.y === partNumber.position.y + 1
+const isTouching = (
+  position1: Position,
+  position2: Position,
+  position1XSize: number = 1
+): boolean => {
+  if (position2.y === position1.y) {
+    if (
+      position2.x === position1.x - 1 ||
+      position2.x === position1.x + position1XSize
     ) {
-      if (
-        symbol.position.x >= partNumber.position.x - 1 &&
-        symbol.position.x <= partNumber.position.x + partNumber.xSize
-      ) {
-        return true;
-      }
+      return true;
+    }
+  } else if (
+    position2.y === position1.y - 1 ||
+    position2.y === position1.y + 1
+  ) {
+    if (
+      position2.x >= position1.x - 1 &&
+      position2.x <= position1.x + position1XSize
+    ) {
+      return true;
     }
   }
   return false;
+};
+
+const isValidPartNumber = (
+  partNumber: PartNumber,
+  symbols: Symbol[]
+): boolean => {
+  for (const symbol of symbols) {
+    if (isTouching(partNumber.position, symbol.position, partNumber.xSize)) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const calculateGearRatio = (
+  symbol: Symbol,
+  partNumbers: PartNumber[]
+): number | undefined => {
+  if (symbol.value !== "*") {
+    return;
+  }
+  let touchingParts = new Array<number>();
+  for (const partNumber of partNumbers) {
+    if (isTouching(partNumber.position, symbol.position, partNumber.xSize)) {
+      touchingParts.push(partNumber.value);
+    }
+  }
+  return touchingParts.length > 1
+    ? touchingParts.reduce((a, b) => a * b)
+    : undefined;
 };
 
 const partOne = async () => {
@@ -88,5 +120,18 @@ const partOne = async () => {
 };
 
 partOne()
+  .then((solution) => console.log(solution))
+  .catch((err) => console.error(err));
+
+const partTwo = async () => {
+  const input = (await readFile("./day-three/input.txt", "utf-8")).split("\n");
+  const { symbols, partNumbers } = parseEngineSchematic(input);
+  const gearRatios = symbols
+    .map((symbol) => calculateGearRatio(symbol, partNumbers))
+    .filter((v) => typeof v === "number") as number[];
+  return gearRatios.reduce((a, b) => a + b);
+};
+
+partTwo()
   .then((solution) => console.log(solution))
   .catch((err) => console.error(err));
