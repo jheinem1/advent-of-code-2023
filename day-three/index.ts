@@ -10,6 +10,10 @@ interface Symbol {
   value: string;
 }
 
+interface Gear extends Symbol {
+  value: "*";
+}
+
 interface PartNumber {
   position: Position;
   xSize: number;
@@ -91,21 +95,26 @@ const isValidPartNumber = (
 };
 
 const calculateGearRatio = (
-  symbol: Symbol,
+  gear: Gear,
   partNumbers: PartNumber[]
 ): number | undefined => {
-  if (symbol.value !== "*") {
-    return;
-  }
   let touchingParts = new Array<number>();
   for (const partNumber of partNumbers) {
-    if (isTouching(partNumber.position, symbol.position, partNumber.xSize)) {
+    if (isTouching(partNumber.position, gear.position, partNumber.xSize)) {
       touchingParts.push(partNumber.value);
     }
   }
   return touchingParts.length > 1
     ? touchingParts.reduce((a, b) => a * b)
     : undefined;
+};
+
+const isGear = (symbol: Symbol): symbol is Gear => {
+  return symbol.value === "*";
+};
+
+const isNumber = (v: unknown): v is number => {
+  return typeof v === "number";
 };
 
 const partOne = async () => {
@@ -126,9 +135,10 @@ partOne()
 const partTwo = async () => {
   const input = (await readFile("./day-three/input.txt", "utf-8")).split("\n");
   const { symbols, partNumbers } = parseEngineSchematic(input);
-  const gearRatios = symbols
-    .map((symbol) => calculateGearRatio(symbol, partNumbers))
-    .filter((v) => typeof v === "number") as number[];
+  const gearRatios: number[] = symbols
+    .filter(isGear)
+    .map((gear) => calculateGearRatio(gear, partNumbers))
+    .filter(isNumber);
   return gearRatios.reduce((a, b) => a + b);
 };
 
